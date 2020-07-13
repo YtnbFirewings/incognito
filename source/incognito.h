@@ -14,7 +14,7 @@ public:
 	bool isOpen();
 	char* backupFileName();
 	bool backup();
-	u64 size();
+	s64 size();
 	bool clean();
 	bool import(const char* path);
 	bool verify();
