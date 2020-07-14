@@ -19,6 +19,8 @@ public:
 	bool import(const char* path);
 	bool verify();
 	char* serial();
+	u32 RegionCode();
+	bool SetRegionCode(u32 usRegionCode);
 	u32 calibrationDataSize();
 	u32 certSize();
 	bool writeCal0Hash();

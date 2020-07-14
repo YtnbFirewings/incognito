@@ -60,21 +60,21 @@ bool backup()
 
 bool install()
 {
-	printf("Are you sure you want erase your personal infomation from prodinfo?\n");
+        printf("Are you sure you want erase your personal infomation from prodinfo?\n");
 
-	if (!confirm())
-	{
-		return end();
-	}
+        if (!confirm())
+        {
+                return end();
+        }
 
-	Incognito incognito;
+        Incognito incognito;
 
-	incognito.clean();
-	printf("new serial:       %s\n", incognito.serial());
-	incognito.close();
+        incognito.clean();
+        printf("new serial:       %s\n", incognito.serial());
+        incognito.close();
 
-	printf("fin, please reboot\n");
-	return end();
+        printf("fin, please reboot\n");
+        return end();
 }
 
 bool verify()
@@ -118,13 +118,35 @@ bool restore()
 	return end();
 }
 
-void printSerial()
+bool setregion(u32 usRegionCode)
+{
+	printf("Are you sure you want set RegionCode to prodinfo?\n");
+
+        if (!confirm())
+        {
+                return end();
+        }
+
+        Incognito incognito;
+
+        incognito.SetRegionCode(usRegionCode);
+        printf("new RegionCode:       %d\n", usRegionCode);
+        incognito.close();
+
+        printf("fin, please reboot\n");
+        return end();
+}
+
+void printInfo()
 {
 	Incognito incognito;
 
-	printf("%s\n", incognito.serial());
+	printf("Serial: %s\n", incognito.serial());
+        printf("Region Code: %d\n", incognito.RegionCode());
 	incognito.close();
 }
+
+
 
 bool mainMenu()
 {
@@ -133,6 +155,8 @@ bool mainMenu()
 	printf("Press B to backup prodinfo.bin only\n");
 	printf("Press Y to restore prodinfo.bin\n");
 	printf("Press X to verify prodinfo NAND\n");
+	printf("Press L to set region 4\n");
+	printf("Press R to set region 1\n");
 	printf("Press + to exit\n\n");
 
 	while (appletMainLoop())
@@ -160,6 +184,17 @@ bool mainMenu()
 		{
 			return verify();
 		}
+		
+		if (keys & KEY_L)
+                {
+                        return setregion(4);
+                }
+    
+		if (keys & KEY_R)
+		{
+			return setregion(1); 
+		}
+
 
 		if (keys & KEY_PLUS)
 		{
@@ -176,7 +211,7 @@ int main(int argc, char **argv)
 	fsInitialize();
 	consoleInit(NULL);
 
-	printSerial();
+	printInfo();
 
 	printf("Warning: This software was written by a not nice person.\n\n");
 	

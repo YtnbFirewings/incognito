@@ -192,6 +192,50 @@ char* Incognito::serial()
 	return serialNumber;
 }
 
+u32 Incognito::RegionCode()
+{
+	return read<u32>(0x3510);
+}
+
+unsigned int crc_16_table[16] = {
+ 0x0000, 0xCC01, 0xD801, 0x1400, 0xF001, 0x3C00, 0x2800, 0xE401,
+ 0xA001, 0x6C00, 0x7800, 0xB401, 0x5000, 0x9C01, 0x8801, 0x4400 };
+
+unsigned short int get_crc_16(char *p, int n) {
+	unsigned short int crc = 0x55AA;
+	int r;
+
+	while (n-- > 0) {
+		r = crc_16_table[crc & 0xF];
+		crc = (crc >> 4) & 0x0FFF;
+		crc = crc ^ r ^ crc_16_table[*p & 0xF];
+
+		r = crc_16_table[crc & 0xF];
+		crc = (crc >> 4) & 0x0FFF;
+		crc = crc ^ r ^ crc_16_table[(*p >> 4) & 0xF];
+
+		p++;
+	}
+
+	return(crc);
+}
+
+
+bool Incognito::SetRegionCode(u32 usRegionCode)
+{
+	u8 buffer[16] = {0x0};
+        *((u32 *)buffer) = usRegionCode;
+        *((u16 *)(&buffer[14])) = get_crc_16((char *)buffer,14);
+        print(buffer, 16);
+        
+	if (fsStorageWrite(&m_sh, 0x3510, buffer, sizeof(buffer)))
+        {
+                printf("error: failed writing region code\n");
+                return false;
+        }
+	return writeCal0Hash();
+}
+
 u32 Incognito::calibrationDataSize()
 {
 	return read<u32>(0x08);
